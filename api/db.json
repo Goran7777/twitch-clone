@@ -1,0 +1,21 @@
+{
+  "streams": [
+    {
+      "title": "Stream 1",
+      "description": "Desc 1",
+      "id": 1
+    },
+    {
+      "title": "Updated 2",
+      "description": "Desc 2",
+      "id": 2,
+      "userId": null
+    },
+    {
+      "title": "Edited Again!",
+      "description": "Edited description",
+      "userId": "116469559255663766896",
+      "id": 7
+    }
+  ]
+}
