@@ -1,4 +1,6 @@
 import streams from '../apis/streams';
+import { db } from '../db/firestore';
+import { v4 as uuidv4 } from 'uuid';
 import { ThunkAction } from 'redux-thunk';
 import { Dispatch, AnyAction } from 'redux';
 import { History } from 'history';
@@ -29,14 +31,18 @@ export const createStream =
   ): ThunkAction<void, IRootState, unknown, AnyAction> =>
   async (dispatch: Dispatch, getState: any) => {
     const { userId } = getState().auth;
+    const id = uuidv4();
+    const document = {
+      ...formValues,
+      userId,
+      id,
+    };
     try {
-      const response = await streams.post('/streams', {
-        ...formValues,
-        userId,
-      });
+      await db.collection('streams').doc().set(document);
+
       dispatch({
         type: CREATE_STREAM,
-        payload: response.data,
+        payload: document,
       });
       history.push('/');
     } catch (error) {
@@ -45,29 +51,33 @@ export const createStream =
   };
 export const getStreams =
   (): ThunkAction<void, IRootState, unknown, AnyAction> =>
-  async (dispatch: Dispatch) => {
-    try {
-      const response = await streams.get('/streams');
+  (dispatch: Dispatch) => {
+    db.collection('streams').onSnapshot((snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+      }));
       dispatch({
         type: GET_STREAMS,
-        payload: response.data,
+        payload: data,
       });
-    } catch (error) {
-      console.log(error.message);
-    }
+    });
   };
 export const getStream =
   (id: string): ThunkAction<void, IRootState, unknown, AnyAction> =>
-  async (dispatch: Dispatch) => {
-    try {
-      const response = await streams.get(`/streams/${id}`);
-      dispatch({
-        type: GET_STREAM,
-        payload: response.data,
-      });
-    } catch (error) {
-      console.log(error.message);
-    }
+  (dispatch: Dispatch) => {
+    db.collection('streams')
+      .where('id', '==', id)
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          dispatch({
+            type: GET_STREAM,
+            payload: data,
+          });
+        });
+      })
+      .catch((error) => console.log(error.message));
   };
 export const updateStream =
   (
@@ -75,32 +85,46 @@ export const updateStream =
     formValues: Record<string, unknown>,
     history: History
   ): ThunkAction<void, IRootState, unknown, AnyAction> =>
-  async (dispatch: Dispatch) => {
-    try {
-      const response = await streams.patch(`/streams/${id}`, formValues);
-      dispatch({
-        type: UPDATE_STREAM,
-        payload: response.data,
+  (dispatch: Dispatch) => {
+    db.collection('streams')
+      .where('id', '==', id)
+      .limit(1)
+      .get()
+      .then((snapshot) => {
+        const thing = snapshot.docs[0];
+        //   console.log(thing);
+        console.log(thing.data());
+        thing.ref.update({ ...formValues });
+        const data = thing.data();
+        console.log(data);
+
+        dispatch({
+          type: UPDATE_STREAM,
+          payload: data,
+        });
+        history.push('/');
       });
-      history.push('/');
-    } catch (error) {
-      console.log(error.message);
-    }
   };
+
 export const deleteStream =
   (
-    id: number,
+    id: string,
     history: History
   ): ThunkAction<void, IRootState, unknown, AnyAction> =>
-  async (dispatch: Dispatch) => {
-    try {
-      await streams.delete(`/streams/${id}`);
-      dispatch({
-        type: DELETE_STREAM,
-        payload: id,
-      });
-      history.push('/');
-    } catch (error) {
-      console.log(error.message);
-    }
+  (dispatch: Dispatch) => {
+    const query = db.collection('streams').where('id', '==', id);
+
+    query
+      .get()
+      .then((snapshoot) => {
+        snapshoot.forEach((doc) => {
+          doc.ref.delete();
+          dispatch({
+            type: DELETE_STREAM,
+            payload: id,
+          });
+          history.push('/');
+        });
+      })
+      .catch((error) => console.log(error.message));
   };

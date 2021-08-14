@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { db } from '../../db/firestore';
 import { getStreams } from '../../actions';
+
 interface IProps {
   getStreams(): any;
   streams: Stream[];

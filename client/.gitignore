@@ -1,4 +1,5 @@
 node_modules/
+scr/db
 dist/
 .cache/
 .idea/

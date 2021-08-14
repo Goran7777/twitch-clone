@@ -56,7 +56,7 @@ const StreamEdit = ({
 
 const mapStateToProps = (state: IRootState, ownProps: MatchProps) => {
   return {
-    stream: state.streams[parseInt(ownProps.match.params.id)],
+    stream: state.streams[ownProps.match.params.id],
   };
 };
 

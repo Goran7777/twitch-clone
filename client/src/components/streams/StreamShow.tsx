@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { getStream } from '../../actions';
 import { History } from 'history';
@@ -27,8 +26,8 @@ const StreamShow = ({ stream, match, getStream }: MatchProps & IProps) => {
         <h2>Loading ...</h2>
       ) : (
         <div>
-          <h1>{stream.title}</h1>
-          <h5>{stream.description}</h5>
+          <h1 className="">{stream.title}</h1>
+          <h5 className="">{stream.description}</h5>
         </div>
       )}
     </>
@@ -37,7 +36,7 @@ const StreamShow = ({ stream, match, getStream }: MatchProps & IProps) => {
 
 const mapStateToProps = (state: IRootState, ownProps: MatchProps) => {
   return {
-    stream: state.streams[parseInt(ownProps.match.params.id)],
+    stream: state.streams[ownProps.match.params.id],
   };
 };
 

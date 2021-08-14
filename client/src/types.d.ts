@@ -7,7 +7,7 @@ interface IRootState {
 interface Stream {
   title: string;
   description: string;
-  id: number;
+  id: string;
   userId: string | null;
 }
 

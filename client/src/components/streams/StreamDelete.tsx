@@ -9,7 +9,7 @@ import { RouteComponentProps } from 'react-router-dom';
 interface IProps {
   history: History;
   getStream(id: string): any;
-  deleteStream(id: number, history: History): any;
+  deleteStream(id: string, history: History): any;
   stream: Stream;
 }
 interface MatchParams {
@@ -59,7 +59,7 @@ const StreamDelete = ({
 
 const mapStateToProps = (state: IRootState, ownProps: MatchProps) => {
   return {
-    stream: state.streams[parseInt(ownProps.match.params.id)],
+    stream: state.streams[ownProps.match.params.id],
   };
 };
 
